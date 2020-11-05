@@ -59,9 +59,20 @@ union fourBytesToLong
 const long controlInterval = 20;
 unsigned long prevControlMillis = 0;
 double encoderPosition;
-int Kp = 0.02; //proportional gain of a PID
-
 float positionSetPoint;
+
+//PID values
+double Kp = 0.02; //proportional gain of a PID
+double Ki = 0; //intergral gain of a PID
+double Kd = 0; //differential gain of a PID
+double minPercent = -100;
+double maxPercent = 100;
+
+//creating PID
+PID myPID(&encoderPosition, &percentDutyCycle, &positionSetPoint, Kp, Ki, Kd, DIRECT); //creating PID
+myPID.SetOutputLimits(minPercent, maxPercent);
+myPID.SetSampleTime(controlInterval);
+myPID.SetMode(AUTOMATIC);
 
 //-------------------------------------------------SETUP-----------------------------------------------------
 void setup() 
@@ -91,6 +102,8 @@ void setup()
   /* Set initial rotation direction */
   digitalWrite(in1, LOW);
   digitalWrite(in2, HIGH);
+
+  positionSetPoint = 0;
 }
 
 
@@ -142,9 +155,8 @@ void controlLoop()
   {
     prevControlMillis = currentMillis; //saves the last time the if statement was used
     encoderPosition = readEncoderCountFromLS7366R(); //recieve current encoder position
-    
-    error = positionSetPoint - encoderPosition; //calculate closed loop error
-    percentDutyCycle = Kp*error; //corrective action by controller
+
+    myPID.Compute(); //computes PID values with 'percent duty cycle as output'
 
     driveMotorPercent(percentDutyCycle); //set motor speed
   }
