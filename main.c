@@ -11,15 +11,19 @@ int main (void)
 
     // Other variables needed
     int i,d,D;
-    char name[100];
+    char fileName[100];
 
     printf("care to enter a name for a file?");
-    fgets(name,100, stdin);
+    //fgets(fileName,100, stdin);
+    scanf("%s",&fileName);
+
+    printf("%s\n", fileName);
+
 
     //---WRITING---
 
     // Try and open the text "sample.txt" (in the current directory) file for writing
-    fOutput = fopen ("name", "w");
+    fOutput = fopen (fileName, "w");
 
     // Check we were able to open the file
     if ( fOutput == NULL)
